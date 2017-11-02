@@ -3,6 +3,7 @@ from .models import Fault
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 
 class ModelTestCase(TestCase):
@@ -10,6 +11,8 @@ class ModelTestCase(TestCase):
 
     def setUp(self):
         """Define the test client and other test variables."""
+        user = User.objects.create(username="nerd")  # ADD THIS LINE
+
         self.fault_description = "Write world class code"
         self.fault_assignee = "rower@robinsonboatclub.co.uk"
         self.fault_item_name = "Some item name"
@@ -20,7 +23,8 @@ class ModelTestCase(TestCase):
                            assignee=self.fault_assignee,
                            item_name=self.fault_item_name,
                            item_description=self.fault_item_description,
-                           status=self.fault_status)
+                           status=self.fault_status,
+                           owner=user)
 
     def test_model_can_create_a_fault(self):
         """Test the fault model can create a fault."""
@@ -35,7 +39,11 @@ class ViewTestCase(TestCase):
 
     def setUp(self):
         """Define the test client and other test variables."""
+        user = User.objects.create(username="nerd")
+
+        # Initialize client and force it to use authentication
         self.client = APIClient()
+        self.client.force_authenticate(user=user)
 
         self.fault_data = {
             'description': 'Write world class code',
@@ -43,6 +51,7 @@ class ViewTestCase(TestCase):
             'item_name': 'Some item name',
             'item_description': 'This is the item that we use in our tests',
             'status': 'Open',
+            'owner': user.id,
         }
 
         self.response = self.client.post(
@@ -53,6 +62,12 @@ class ViewTestCase(TestCase):
     def test_api_can_create_a_fault(self):
         """Test the api has fault creation capability."""
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_authorization_is_enforced(self):
+        """Test that the api has user authorization."""
+        new_client = APIClient()
+        res = new_client.get('/faults/', kwargs={'pk': 3}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_can_get_a_fault(self):
         """Test the api can get a given fault."""
