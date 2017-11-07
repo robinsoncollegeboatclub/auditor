@@ -183,4 +183,4 @@ Temporary Items
 .apdisk
 
 # Deployment specific environment variables
-base/base/deployed.py
+auditor/base/deployed.py
