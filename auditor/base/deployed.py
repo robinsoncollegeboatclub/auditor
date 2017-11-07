@@ -127,3 +127,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Cors Configuration
+# https://github.com/ottoyiu/django-cors-headers/
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'faults.robinsonboatclub.co.uk',
+    'auditor.robinsonboatclub.co.uk'
+)
