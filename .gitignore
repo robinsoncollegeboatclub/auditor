@@ -181,3 +181,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Deployment specific environment variables
+base/base/deployed.py
